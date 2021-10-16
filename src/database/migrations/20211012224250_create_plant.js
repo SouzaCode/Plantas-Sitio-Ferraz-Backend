@@ -10,13 +10,14 @@ exports.up = function (knex) {
             .references('id_user')
             .inTable('User')
             .notNullable();
-        table.string("observation");
+        table.text("observations");
         table.int("day_planted");
         table.int("month_planted");
         table.int("year_planted").notNullable();
         table.timestamp("date_death");
         table.decimal("latitude");
         table.decimal("longitude");
+        table.boolean("is_private").defaultTo(false);
     })
 };
 
