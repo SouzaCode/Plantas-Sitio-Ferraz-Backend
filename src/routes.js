@@ -1,18 +1,22 @@
-const express = require("express")
+const express = require("express");
 
 
 
-const SpeciesController = require("./controllers/SpeciesController")
+const SpeciesController = require("./controllers/SpeciesController");
 
 
-const routes = express.Router()
+const routes = express.Router();
 
 
 // req.query
 // req.params
 // req.body
 
-routes.get("/species", SpeciesController.listAllSpecies)
+/*Rotas de Specie */
+const speciesRouter = express.Router({ mergeParams: true });
+routes.use('/species', speciesRouter);
+speciesRouter.get("/", SpeciesController.listAllSpecies);
+speciesRouter.get("/:id", SpeciesController.getSpecieDetails);
 
 
 module.exports = routes
