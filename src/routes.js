@@ -23,5 +23,6 @@ speciesRouter.get("/:id", SpeciesController.getSpecieDetails);
 const userRouter = express.Router({ mergeParams: true });
 routes.use('/user', userRouter);
 userRouter.put('/register', UserController.registerNewUser)
+userRouter.post('/login', UserController.login)
 
 module.exports = routes
