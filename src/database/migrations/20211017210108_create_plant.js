@@ -18,6 +18,9 @@ exports.up = function (knex) {
         table.decimal("latitude");
         table.decimal("longitude");
         table.boolean("is_private").defaultTo(false);
+        table.integer("id_planter")
+            .references('id_user')
+            .inTable('User');
     })
 };
 

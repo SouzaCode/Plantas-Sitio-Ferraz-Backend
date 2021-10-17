@@ -3,7 +3,7 @@ exports.up = function (knex) {
     return knex.schema.createTable('Plant_Photo', function (table) {
         table.increments("id_plant_photo").primary();
         table.text("img_plant").notNullable();
-        table.integer("fk_id_plant")
+        table.string("fk_id_plant")
             .references('id_plant')
             .inTable('Plant')
             .notNullable();
