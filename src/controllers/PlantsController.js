@@ -3,8 +3,8 @@ const jwt = require('jsonwebtoken');
 
 module.exports = {
     async getAllPlants(req, res) {
-        const { species, users, token, private } = req.headers;
-
+        const { species, users, token, private, page } = req.headers;
+        let pageNumber = page ? parseInt(page) * 10 : 0;
         let decodedJWT;
         let userQuery = ""
         if (users) {
@@ -51,7 +51,8 @@ module.exports = {
 
 
         }
-        let final_query = "select * from Plant" + userQuery + speciesQuery + privateQuery;
+        let final_query = "select * from Plant" + userQuery + speciesQuery + privateQuery + " limit 10 offset " + pageNumber;
+        console.log(final_query);
         const plants = await connection.raw(final_query)
         let plantsData = [];
         if (plants.length) {
@@ -63,6 +64,8 @@ module.exports = {
                 })
             }
         }
-        return res.json({ "Plants": plantsData })
+        const rows = await connection('Plant').count('id_plant', { as: 'count' })
+        console.log(rows);
+        return res.json({ "Total": rows[0].count, "Plants": plantsData })
     }
 }
