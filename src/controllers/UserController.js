@@ -20,9 +20,7 @@ module.exports = {
     async login(req, res) {
         const { email, hash_password } = req.body;
         const user = await connection("User").select("*").where("email", email);
-        console.log(user);
         let salt_password = await CryptoJS.MD5(hash_password + process.env.SALT_PASSWORD);
-        console.log(String(salt_password));
         if (!user.length) {
             return res.status(404).json({ "Error": "Email not found on database." });
         }
@@ -33,9 +31,11 @@ module.exports = {
             {
                 id_user: user[0].id_user,
                 email: user[0].email,
-                profile_image: user[0].profile_image,
                 name: user[0].name
             }, process.env.SECRET_JWT, { expiresIn: '24h' });
-        return res.json({ "token": token })
+        return res.json({
+            "token": token,
+            "profile_image": user[0].profile_image
+        })
     }
 }
