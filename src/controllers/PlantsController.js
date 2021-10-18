@@ -28,6 +28,9 @@ module.exports = {
         }
         let privateQuery = ""
         if (private == 1) {
+            if (!decodedJWT) {
+                return res.status(401).json({ "Error": "No token provided." })
+            }
             if (users || species) {
                 privateQuery = " and is_private = 0 or fk_id_user = " + decodedJWT.id_user;
             } else {
