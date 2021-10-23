@@ -31,5 +31,6 @@ const plantsRouter = express.Router({ mergeParams: true });
 routes.use('/plants', plantsRouter)
 plantsRouter.get('/', PlantsController.getAllPlants)
 plantsRouter.get('/:id', PlantsController.getPlantDetailsById)
+plantsRouter.delete('/:id', PlantsController.deletePlantByID)
 
 module.exports = routes

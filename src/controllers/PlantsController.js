@@ -81,7 +81,7 @@ module.exports = {
             .join("Specie", "Specie.id_specie", "Plant.fk_id_specie")
             .leftJoin("User", "User.id_user", "Plant.fk_id_user")
             .leftJoin("User as UserB", "User.id_user", "Plant.id_planter")
-            .where("id_plant", id);
+            .where("Plant.id_plant", id);
         if (!plant_details.length) {
             return res.status(404).json({ "Error": "No plant with id " + id });
         }
@@ -108,5 +108,29 @@ module.exports = {
                 "Diary": diary_entries
             }
         })
+    },
+    async deletePlantByID(req, res) {
+        const { id } = req.params;
+        const { token } = req.headers
+        const plant_details = await connection("Plant")
+            .select("*")
+            .where("id_plant", id);
+        if (!plant_details.length) {
+            return res.status(404).json({ "Error": "No plant with id " + id });
+        }
+
+        if (token) {
+            try {
+                decodedJWT = jwt.verify(token, process.env.SECRET_JWT);
+                if (decodedJWT.id_user != plant_details[0].fk_id_user) {
+                    return res.status(401).json({ "Error": "You do not have access to this!" })
+                }
+            } catch (err) {
+                return res.status(401).json({ "Error": "Invalid Token with message '" + err + "'" })
+            }
+        } else { return res.status(401).json({ "Error": "You are not logged in." }) }
+        const plant_del = await connection("Plant").delete().where("id_plant", id)
+        return res.json({ "Response": "Plant deleted successfully" });
     }
+
 }
