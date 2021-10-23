@@ -30,5 +30,6 @@ userRouter.post('/login', UserController.login)
 const plantsRouter = express.Router({ mergeParams: true });
 routes.use('/plants', plantsRouter)
 plantsRouter.get('/', PlantsController.getAllPlants)
+plantsRouter.get('/:id', PlantsController.getPlantDetailsById)
 
 module.exports = routes
