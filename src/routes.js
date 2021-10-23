@@ -19,6 +19,7 @@ const speciesRouter = express.Router({ mergeParams: true });
 routes.use('/species', speciesRouter);
 speciesRouter.get("/", SpeciesController.listAllSpecies);
 speciesRouter.get("/:id", SpeciesController.getSpecieDetails);
+speciesRouter.delete("/:id", SpeciesController.deleteSpecieByID);
 
 /*Rotas de User */
 const userRouter = express.Router({ mergeParams: true });

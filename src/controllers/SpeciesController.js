@@ -1,5 +1,6 @@
 const connection = require("../database/connection");
 
+const CryptoJS = require("crypto-js")
 module.exports = {
     async listAllSpecies(req, res) {
         const species = await connection("Specie")
@@ -22,5 +23,28 @@ module.exports = {
         }
         const photos = await connection("Specie_Photo").select("img_specie").where("fk_id_specie", id)
         return res.json({ "Details": specie[0], "Photos": photos })
+    },
+    async deleteSpecieByID(req, res) {
+        const { id } = req.params;
+        const { secret } = req.headers
+        if (id == 1) {
+            return res.status(401).json({ "Error": "You can't delete the base category!!" })
+        }
+        const specie_details = await connection("Specie")
+            .select("*")
+            .where("id_specie", id);
+        if (!specie_details.length) {
+            return res.status(404).json({ "Error": "No specie with id " + id });
+        }
+
+        if (secret) {
+            let hash_secret = await CryptoJS.MD5(process.env.SECRET_JWT);
+            if (secret != hash_secret) {
+                return res.status(401).json({ "Error": "Wrong secret" })
+            }
+        } else { return res.status(401).json({ "Error": "You have to provide the secret message!!" }) }
+        const mod_plant = await connection("Plant").update("fk_id_specie", 1).where("fk_id_specie", id);
+        const specie_del = await connection("Specie").delete().where("id_specie", id)
+        return res.json({ "Response": "Specie deleted successfully" });
     }
 }
