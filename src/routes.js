@@ -27,6 +27,7 @@ routes.use('/user', userRouter);
 userRouter.put('/register', UserController.registerNewUser)
 userRouter.post('/login', UserController.login)
 userRouter.post('/:id', UserController.updateUserData)
+userRouter.post('/photo/:id', UserController.updateUserImage)
 
 /*Rotas de Plants*/
 const plantsRouter = express.Router({ mergeParams: true });

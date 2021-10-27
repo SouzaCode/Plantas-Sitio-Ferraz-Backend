@@ -66,9 +66,43 @@ module.exports = {
             "name": newName
         }).where("id_user", id)
         if (!newUser) {
-            return res.status(500).json({ "Error": "Erro ao atualizar os dados" })
+            return res.status(500).json({ "Error": "Error on data update" })
         }
 
         return res.json({ "Response": "Data update successfully" })
+    },
+    async updateUserImage(req, res) {
+        const { photo } = req.body;
+        const { id } = req.params;
+        const { token } = req.headers;
+
+        if (!photo) {
+            return res.status(400).json({ "Error": "Image not provided" })
+        }
+
+        const oldUser = await connection("User").select("id_user").where("id_user", id);
+        if (!oldUser.length) {
+            return res.status(404).json({ "Error": "User not found" })
+        }
+        if (token) {
+            try {
+                let decodedJWT = jwt.verify(token, process.env.SECRET_JWT);
+                if (decodedJWT.id_user != oldUser[0].id_user) {
+                    return res.status(401).json({ "Error": "You do not have access to this!" })
+                }
+            } catch (err) {
+                return res.status(401).json({ "Error": "Invalid Token with message '" + err + "'" })
+            }
+        } else { return res.status(401).json({ "Error": "You are not logged in." }) }
+
+
+        const newUser = await connection("User").update({
+            "profile_image": photo
+        }).where("id_user", id)
+        if (!newUser) {
+            return res.status(500).json({ "Error": "Error on image update" })
+        }
+
+        return res.json({ "Response": "Image update successfully" })
     }
 }
