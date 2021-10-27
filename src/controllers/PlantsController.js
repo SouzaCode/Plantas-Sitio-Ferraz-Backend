@@ -121,7 +121,7 @@ module.exports = {
 
         if (token) {
             try {
-                decodedJWT = jwt.verify(token, process.env.SECRET_JWT);
+                let decodedJWT = jwt.verify(token, process.env.SECRET_JWT);
                 if (decodedJWT.id_user != plant_details[0].fk_id_user) {
                     return res.status(401).json({ "Error": "You do not have access to this!" })
                 }
