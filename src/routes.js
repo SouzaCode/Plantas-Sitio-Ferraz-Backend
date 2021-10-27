@@ -18,6 +18,7 @@ const routes = express.Router();
 const speciesRouter = express.Router({ mergeParams: true });
 routes.use('/species', speciesRouter);
 speciesRouter.get("/", SpeciesController.listAllSpecies);
+speciesRouter.put("/", SpeciesController.newSpecies);
 speciesRouter.get("/:id", SpeciesController.getSpecieDetails);
 speciesRouter.delete("/:id", SpeciesController.deleteSpecieByID);
 

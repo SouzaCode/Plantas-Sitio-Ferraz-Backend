@@ -1,4 +1,5 @@
 const connection = require("../database/connection");
+const jwt = require('jsonwebtoken');
 
 const CryptoJS = require("crypto-js")
 module.exports = {
@@ -46,5 +47,51 @@ module.exports = {
         const mod_plant = await connection("Plant").update("fk_id_specie", 1).where("fk_id_specie", id);
         const specie_del = await connection("Specie").delete().where("id_specie", id)
         return res.json({ "Response": "Specie deleted successfully" });
+    },
+    async newSpecies(req, res) {
+        const { scientific_name, common_names, photos, description } = req.body;
+        const { token } = req.headers;
+
+        if (!scientific_name) {
+            return res.status(400).json({ "Error": "Name not provided" })
+        }
+
+        const spcVerify = await connection("Specie").whereRaw("LOWER(scientific_name) = '" + scientific_name.toLowerCase() + "'")
+        if (spcVerify.length) {
+            return res.status(401).json({ "Error": "Specie already exists" })
+        }
+
+        if (token) {
+            try {
+                let decodedJWT = jwt.verify(token, process.env.SECRET_JWT);
+
+            } catch (err) {
+                return res.status(401).json({ "Error": "Invalid Token with message '" + err + "'" })
+            }
+        } else { return res.status(401).json({ "Error": "You are not logged in." }) }
+
+        const newSpecies = await connection("Specie").insert({
+            "scientific_name": scientific_name,
+            "description": description
+        })
+        if (common_names) {
+            for (i in common_names) {
+                const newName = await connection("Common_Names").insert({
+                    "fk_id_specie": newSpecies[0],
+                    "name": common_names[i]
+                })
+            }
+        }
+
+        if (photos) {
+            for (i in photos) {
+                const newPhoto = await connection("Photo").insert({
+                    "fk_id_specie": newSpecies[0],
+                    "img_specie": photos[i]
+                })
+            }
+        }
+
+        return res.json({ "Response": "Species created successfully, with id " + newSpecies[0] })
     }
 }
