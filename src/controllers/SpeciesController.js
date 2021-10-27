@@ -23,7 +23,8 @@ module.exports = {
             return res.status(404).json({ "Error": "No species found with id " + id })
         }
         const photos = await connection("Specie_Photo").select("img_specie").where("fk_id_specie", id)
-        return res.json({ "Details": specie[0], "Photos": photos })
+        const names = await connection("Common_Name").select("name").where("fk_id_specie", id)
+        return res.json({ "Details": specie[0], "Photos": photos, "Common_Names": names })
     },
     async deleteSpecieByID(req, res) {
         const { id } = req.params;
