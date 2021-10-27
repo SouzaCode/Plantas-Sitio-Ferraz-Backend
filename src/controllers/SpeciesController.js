@@ -53,6 +53,7 @@ module.exports = {
         const { scientific_name, common_names, photos, description } = req.body;
         const { token } = req.headers;
 
+        console.log(common_names, photos);
         if (!scientific_name) {
             return res.status(400).json({ "Error": "Name not provided" })
         }
@@ -77,7 +78,7 @@ module.exports = {
         })
         if (common_names) {
             for (i in common_names) {
-                const newName = await connection("Common_Names").insert({
+                const newName = await connection("Common_Name").insert({
                     "fk_id_specie": newSpecies[0],
                     "name": common_names[i]
                 })
@@ -86,7 +87,7 @@ module.exports = {
 
         if (photos) {
             for (i in photos) {
-                const newPhoto = await connection("Photo").insert({
+                const newPhoto = await connection("Specie_Photo").insert({
                     "fk_id_specie": newSpecies[0],
                     "img_specie": photos[i]
                 })
