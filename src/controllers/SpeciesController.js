@@ -58,7 +58,7 @@ module.exports = {
             return res.status(400).json({ "Error": "Name not provided" })
         }
 
-        const spcVerify = await connection("Specie").whereRaw("LOWER(scientific_name) = '" + scientific_name.toLowerCase() + "'")
+        const spcVerify = await connection("Specie").whereRaw("LOWER(scientific_name) = '" + scientific_name.toLowerCase() + "'") // isso aqui ta pedindo pra ter sql injection
         if (spcVerify.length) {
             return res.status(401).json({ "Error": "Specie already exists" })
         }

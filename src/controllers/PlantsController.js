@@ -131,6 +131,31 @@ module.exports = {
         } else { return res.status(401).json({ "Error": "You are not logged in." }) }
         const plant_del = await connection("Plant").delete().where("id_plant", id)
         return res.json({ "Response": "Plant deleted successfully" });
+    },
+    async killPlant(req, res) {
+        const { id } = req.params;
+        const { token } = req.headers
+        let decodedJWT;
+        if (token) {
+            try {
+                decodedJWT = jwt.verify(token, process.env.SECRET_JWT);
+            } catch (err) {
+                return res.status(401).json({ "Error": "Invalid Token with message '" + err + "'" })
+            }
+        } else { return res.status(401).json({ "Error": "You are not logged in." }) }
+
+        const plant = await connection("Plant").select("*").where("id_plant", id);
+        if (!plant.length) {
+            return res.status(404).json({ "Error": "Plant not Found" })
+        }
+        const timeNow = parseInt(Date.now() / 1000)
+        const nplant = await connection("Plant").update("date_death", timeNow).where("id_plant", id);
+
+        const diary = await connection("Diary").insert({
+            "annotation": "User " + decodedJWT.name + " marked this plant as DEAD",
+            "fk_id_plant": id,
+            "dt_entry": timeNow
+        })
     }
 
 }
