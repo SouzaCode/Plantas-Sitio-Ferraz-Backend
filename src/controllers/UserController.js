@@ -20,11 +20,13 @@ module.exports = {
     async login(req, res) {
         const { email, hash_password } = req.body;
         const user = await connection("User").select("*").where("email", email);
-        let salt_password = await CryptoJS.MD5(hash_password + process.env.SALT_PASSWORD);
+        console.log(hash_password);
+        let salt_password = await CryptoJS.MD5((hash_password + process.env.SALT_PASSWORD));
+        console.log(salt_password.toString());
         if (!user.length) {
             return res.status(404).json({ "Error": "Email not found on database." });
         }
-        if (user[0].hash_password != salt_password) {
+        if (user[0].hash_password != salt_password.toString()) {
             return res.status(404).json({ "Error": "Wrong Password!" });
         }
         const token = jwt.sign(
