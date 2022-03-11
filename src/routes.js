@@ -37,5 +37,6 @@ plantsRouter.get('/', PlantsController.getAllPlants)
 plantsRouter.get('/:id', PlantsController.getPlantDetailsById)
 plantsRouter.delete('/:id', PlantsController.deletePlantByID)
 plantsRouter.post('/kill/:id', PlantsController.killPlant)
+plantsRouter.put('/', PlantsController.addNewPlant)
 
 module.exports = routes

@@ -19,13 +19,14 @@ module.exports = {
             }
 
         }
+        /*
         if (token) {
             try {
                 decodedJWT = jwt.verify(token, process.env.SECRET_JWT);
             } catch (err) {
                 return res.status(401).json({ "Error": "Invalid Token with message '" + err + "'" })
             }
-        }
+        }*/
         let privateQuery = ""
         if (private == 1) {
             if (!decodedJWT) {
@@ -156,6 +157,23 @@ module.exports = {
             "fk_id_plant": id,
             "dt_entry": timeNow
         })
+        return res.json({ "Response": "Plant killed successfully" });
+    },
+    async addNewPlant(req, res) {
+        const { token } = req.headers;
+        const { id_specie, new_common_name, photos, year, month, day, gps_position } = req.body;
+        let decodedJWT;
+        if (token) {
+            try {
+                decodedJWT = jwt.verify(token, process.env.SECRET_JWT);
+            } catch (err) {
+                return res.status(401).json({ "Error": "Invalid Token with message '" + err + "'" })
+            }
+        } else { return res.status(401).json({ "Error": "You are not logged in." }) }
+        console.log(id_specie, new_common_name, photos, year, month, day, gps_position);
+
+        return res.json({ "Response": "ffff" });
+
     }
 
 }
