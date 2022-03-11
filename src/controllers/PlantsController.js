@@ -1,9 +1,10 @@
 const connection = require("../database/connection");
 const jwt = require('jsonwebtoken');
+const randomString = require('random-base64-string')
 
 module.exports = {
     async getAllPlants(req, res) {
-        const { species, users, token, private, page } = req.headers;
+        const { species, users, token, is_private, page } = req.headers;
         let pageNumber = page ? parseInt(page) * 10 : 0;
         let decodedJWT;
         let userQuery = ""
@@ -28,7 +29,7 @@ module.exports = {
             }
         }*/
         let privateQuery = ""
-        if (private == 1) {
+        if (is_private == 1) {
             if (!decodedJWT) {
                 return res.status(401).json({ "Error": "No token provided." })
             }
@@ -161,7 +162,7 @@ module.exports = {
     },
     async addNewPlant(req, res) {
         const { token } = req.headers;
-        const { id_specie, new_common_name, photos, year, month, day, gps_position } = req.body;
+        const { id_specie, new_common_name, photos, year, month, day, gps_position, observations, is_private, id_planter } = req.body;
         let decodedJWT;
         if (token) {
             try {
@@ -170,9 +171,76 @@ module.exports = {
                 return res.status(401).json({ "Error": "Invalid Token with message '" + err + "'" })
             }
         } else { return res.status(401).json({ "Error": "You are not logged in." }) }
-        console.log(id_specie, new_common_name, photos, year, month, day, gps_position);
+        const specie = await connection("Specie").select("id_specie").where("id_specie", id_specie);
+        if (specie.length == 0) {
+            return res.status(404).json({ "Error": "Specie not found" })
+        }
+        console.log(Date.now() / 1000);
+        //console.log(parseInt(new Date(2021, 08, 6).getTime() / 1000));
+        //console.log(id_specie, new_common_name, photos, year, month, day, gps_position);
 
-        return res.json({ "Response": "ffff" });
+
+
+        var new_plant_id = randomString(parseInt(process.env.PLANT_ID_LENGTH));
+        var achou = false;
+        do {
+            const exist_plant = await connection("Plant").select("id_plant").where("id_plant", new_plant_id)
+            if (exist_plant.length > 0) {
+                achou = true; new_plant_id = randomString(parseInt(process.env.PLANT_ID_LENGTH));
+            } else {
+                achou = false;
+            }
+        } while (achou)
+
+        const plant = await connection("Plant").insert({
+            "id_plant": new_plant_id,
+            "fk_id_specie": id_specie,
+            "fk_id_user": decodedJWT.id_user,
+            "observations": observations,
+            "day_planted": day ? day : null,
+            "month_planted": month ? month : null,
+            "year_planted": year ? year : null,
+            "latitude": gps_position ? gps_position.latitude : null,
+            "longitude": gps_position ? gps_position.longitude : null,
+            "is_private": is_private,
+            "id_planter": id_planter ? id_planter : null
+
+
+        })
+        if (!plant) {
+            return res.status(500).json({ "Error": "Error on plant creation" });
+
+        }
+        for (i in photos) {
+            pht = photos[i];
+            const image = await connection("Plant_Photo").insert({
+                "img_plant": pht.image,
+                "fk_id_user": decodedJWT.id_user,
+                "img_date": pht.image_timestamp ? pht.image_timestamp : parseInt(Date.now() / 1000),
+                "fk_id_plant": new_plant_id
+            })
+            if (!image) {
+                return res.status(500).json({ "Error": "Error on adding plant photo with index " + i });
+
+            }
+        }
+        if (new_common_name && new_common_name.length > 0) {
+            for (i in new_common_name) {
+                const cm_name = await connection("Common_Name").select("*").where("name", new_common_name[i]).where("fk_id_specie", id_specie);
+                if (cm_name.length) {
+                    continue
+                }
+                const commom_name = await connection("Common_Name").insert({
+                    "name": new_common_name[i],
+                    "fk_id_specie": id_specie
+                })
+                if (!commom_name) {
+                    return res.status(500).json({ "Error": "Error on adding plant common name with index " + i });
+
+                }
+            }
+        }
+        return res.json({ "Response": "Plant with id " + new_plant_id + " created successfully" });
 
     }
 
