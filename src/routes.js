@@ -5,6 +5,7 @@ const express = require("express");
 const SpeciesController = require("./controllers/SpeciesController");
 const UserController = require("./controllers/UserController");
 const PlantsController = require("./controllers/PlantsController");
+const DiaryController = require("./controllers/DiaryController");
 
 
 const routes = express.Router();
@@ -38,5 +39,10 @@ plantsRouter.get('/:id', PlantsController.getPlantDetailsById)
 plantsRouter.delete('/:id', PlantsController.deletePlantByID)
 plantsRouter.post('/kill/:id', PlantsController.killPlant)
 plantsRouter.put('/', PlantsController.addNewPlant)
+
+/*Rotas de Diary*/
+const diaryRouter = express.Router({ mergeParams: true });
+routes.use('/diary', diaryRouter)
+diaryRouter.put('/:id_plant', DiaryController.addDiaryEntry)
 
 module.exports = routes
