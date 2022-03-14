@@ -81,11 +81,13 @@ module.exports = {
         }
         const diary_entries = await connection("Diary").select("*").where("fk_id_plant", id);
         const plant_photos = await connection("Plant_Photo").select("*").where("fk_id_plant", id);
+        const common_names = await connection("Common_Name").select("*").where("fk_id_specie", plant_details[0].fk_id_specie);
         return res.json({
             "Response": {
                 "Details": plant_details[0],
                 "Photos": plant_photos,
-                "Diary": diary_entries
+                "Diary": diary_entries,
+                "Common_Names": common_names
             }
         })
     },
