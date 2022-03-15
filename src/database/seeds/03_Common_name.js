@@ -4,8 +4,8 @@ exports.seed = function (knex) {
         .then(function () {
             // Inserts seed entries
             return knex('Common_Name').insert([
-                { name: "Araucária", fk_id_specie: 1 },
-                { name: "Pinheiro do Paraná", fk_id_specie: 1 }
+                { name: "Araucária", fk_id_specie: 2 },
+                { name: "Pinheiro do Paraná", fk_id_specie: 2 }
             ]);
         });
 };

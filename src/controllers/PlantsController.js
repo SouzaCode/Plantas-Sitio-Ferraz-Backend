@@ -35,10 +35,10 @@ module.exports = {
             subquery.where("Plant.is_private", 0)
         }
         subquery.limit(10).offset(pageNumber)
-        console.log(subquery.toString())
+        //console.log(subquery.toString())
 
         const plants = await subquery
-        console.log(plants);
+        //console.log(plants);
         let plantsData = [];
         if (plants.length) {
             for (i in plants) {
@@ -81,6 +81,7 @@ module.exports = {
         }
         const diary_entries = await connection("Diary").select("*").where("fk_id_plant", id);
         const plant_photos = await connection("Plant_Photo").select("*").where("fk_id_plant", id);
+        console.log(plant_details[0]);
         const common_names = await connection("Common_Name").select("*").where("fk_id_specie", plant_details[0].fk_id_specie);
         return res.json({
             "Response": {
